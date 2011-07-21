@@ -77,7 +77,7 @@
             }
             
             if (! expandedUrl && keywordExpansions['Default']) {
-                if (! url.match(/(^localhost|\/|\.)/)) {
+                if (! url.match(/(^localhost|\/|\.|:)/)) {
                     expandedUrl = keywordExpansions.Default.replace('@@@', url);
                 }
             }
