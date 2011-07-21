@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SafariKeywordSearch</title>
+    <script type="text/javascript">
+        
+        var keywordExpansions = {
+            a: 'http://www.amazon.co.uk/exec/obidos/search-handle-url/index%3Dblended%26field-keywords%3D@@@',
+            am: 'http://allmusic.com/search/artist/@@@',
+            ao: 'http://waybackmachine.org/*/@@@',
+            au: 'http://www.amazon.com/exec/obidos/search-handle-url/index%3Dblended%26field-keywords%3D@@@',
+            ba: 'http://beeradvocate.com/search?q=@@@&qt=beer',
+            bp: 'http://aurlien.backpackit.com/homepage',
+            buss: 'http://www.idi.ntnu.no/~tagore/cgi-bin/busstuc/busq.cgi?quest=@@@',
+            css: 'http://search.sitepoint.com/?refinements%5Breference%5D=1&refinements%5Barticles%5D=0&refinements%5Bblogs%5D=0&refinements%5Bmarketplace%5D=0&refinements%5Bforums%5D=0&refinements%5Bproducts%5D=0&q=@@@',
+            down: 'http://downforeveryoneorjustme.com/@@@',
+            e: 'http://search.ebay.com/search/search.dll?satitle=@@@',
+            f: 'http://www.finn.no/finn/torget/tilsalgs/resultat?sort=5&keyword=@@@',
+            fk: 'http://kart.finn.no/?q=@@@',
+            theDefault: "http://www.google.com/search?q=@@@&btnI=I'm+Feeling+Lucky",
+            g: 'http://www.google.com/search?q=@@@',
+            gb: 'http://images.google.com/images?q=@@@&ie=UTF-8&oe=UTF-8',
+            gl: "http://www.google.com/search?q=@@@&btnI=I'm+Feeling+Lucky",
+            theDefault: "http://www.google.com/search?q=@@@&btnI=I'm+Feeling+Lucky",
+            gm: 'http://maps.google.com/maps?oi=map&q=@@@',
+            hw: 'http://www.prisguide.no/sok?pg-q=@@@',
+            imdb: 'http://imdb.com/find?s=all&q=@@@',
+            l: 'http://www.last.fm/search?m=all&q=@@@',
+            lw: 'http://lyrics.wikia.com/Special:Search?search=@@@',
+            mc: 'http://www.metacritic.com/search/process?ts=@@@',
+            p: 'http://www.play.com/Search.aspx?searchtype=allproducts&searchstring=@@@',
+            pakke: 'http://sporing.posten.no/Sporing/KMSporingInternett.aspx?shipmentNumber=,complete query',
+            rb: 'http://ratebeer.com/findbeer.asp?BeerName=@@@',
+            so: 'http://stackoverflow.com/search?q=@@@',
+            t: 'http://www.torrentz.com/search?q=@@@',
+            tlf: 'http://www.gulesider.no/tk/search.c?q=@@@',
+            tpb: 'http://thepiratebay.org/search/@@@/0/7/0',
+            tv: 'http://thetvdb.com/index.php?seriesname=@@@&fieldlocation=2&language=7&order=translation&searching=Search&tab=advancedsearch',
+            ud: 'http://www.urbandictionary.com/define.php?term=@@@',
+            w: 'http://en.wikipedia.org/wiki/Special:Search/@@@',
+            wa: 'http://www.wolframalpha.com/input/?i=@@@',
+            wi: 'http://en.wiktionary.org/wiki/special:search/@@@',
+            wn: 'http://no.wikipedia.org/wiki/Special:Search/@@@',
+            y: 'http://youtube.com/results?search_query=@@@'
+        };
+        
+        safari.application.addEventListener('beforeNavigate', function(evt) {
+            var url = evt.url,
+                expandedUrl;
+            
+            url = url.replace(/^\w{2,8}:\/\//, '').replace(/\/$/, '');
+            
+            for (var key in keywordExpansions) {
+                if (keywordExpansions.hasOwnProperty(key)) {
+                    var matchRegex,
+                        keyRegex,
+                        isKeywordExpansion = keywordExpansions[key].match('@@@');
+                    
+                    if (isKeywordExpansion) {
+                        matchRegex = new RegExp('^' + key + '%20.+');
+                        keyRegex = new RegExp('^' + key + '(%20)*');
+                    } else {
+                        matchRegex = new RegExp('^' + key + '$');
+                    }
+                        
+                    if (url.match(matchRegex)) {
+                        if (isKeywordExpansion) {
+                            expandedUrl = keywordExpansions[key].replace('@@@', url.replace(keyRegex, ''));
+                        } else {
+                            expandedUrl = keywordExpansions[key];
+                        }
+                        break;
+                    }
+                }
+            }
+            
+            if (! expandedUrl && keywordExpansions['theDefault']) {
+                if (url.match('%20') && ! url.match(/(^localhost|\/|\.)/)) {
+                    expandedUrl = keywordExpansions.theDefault.replace('@@@', url);
+                }
+            }
+            
+            if (expandedUrl) {
+                evt.preventDefault();
+                safari.application.activeBrowserWindow.activeTab.url = expandedUrl;
+            }
+        }, true);
+    </script>
+</head>
+<body>
+
+
+
+</body>
+</html>
