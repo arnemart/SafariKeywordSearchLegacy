@@ -19,7 +19,6 @@
     margin: 0 !important;
     padding: 1em !important;
 }
-
 #SafariKeywordSearchSettingsDiv___ input.SafariKeywordSearchSettingsShortcut___ {
     background-color: white !important;
     border: 1px solid #666 !important;
@@ -27,8 +26,8 @@
     color: black !important;
     width: 5em !important;
     margin: 0.2em !important;
+    cursor: text !important;
 }
-
 #SafariKeywordSearchSettingsDiv___ input.SafariKeywordSearchSettingsExpansion___ {
     background-color: white !important;
     border: 1px solid #666 !important;
@@ -36,4 +35,5 @@
     color: black !important;
     width: 30em !important;
     margin: 0.2em !important;
+    cursor: text !important;
 }
