@@ -18,7 +18,6 @@
             e: 'http://search.ebay.com/search/search.dll?satitle=@@@',
             f: 'http://www.finn.no/finn/torget/tilsalgs/resultat?sort=5&keyword=@@@',
             fk: 'http://kart.finn.no/?q=@@@',
-            theDefault: "http://www.google.com/search?q=@@@&btnI=I'm+Feeling+Lucky",
             g: 'http://www.google.com/search?q=@@@',
             gb: 'http://images.google.com/images?q=@@@&ie=UTF-8&oe=UTF-8',
             gl: "http://www.google.com/search?q=@@@&btnI=I'm+Feeling+Lucky",
@@ -48,6 +47,10 @@
         safari.application.addEventListener('beforeNavigate', function(evt) {
             var url = evt.url,
                 expandedUrl;
+            
+            if (! url) {
+                return;
+            }
             
             url = url.replace(/^\w{2,8}:\/\//, '').replace(/\/$/, '');
             
@@ -86,6 +89,7 @@
                 safari.application.activeBrowserWindow.activeTab.url = expandedUrl;
             }
         }, true);
+        
     </script>
 </head>
 <body>
