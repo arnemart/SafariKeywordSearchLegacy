@@ -79,7 +79,7 @@
             }
             
             if (! expandedUrl && keywordExpansions['theDefault']) {
-                if (url.match('%20') && ! url.match(/(^localhost|\/|\.)/)) {
+                if (! url.match(/(^localhost|\/|\.)/)) {
                     expandedUrl = keywordExpansions.theDefault.replace('@@@', url);
                 }
             }
