@@ -1,0 +1,39 @@
+#SafariKeywordSearchSettingsDivOverlay___ {
+    z-index: 9998 !important;
+    background-color: rgba(0, 0, 0, 0.7) !important;
+    position: fixed !important;
+    top: -100px !important;
+    bottom: -100px !important;
+    left: -100px !important;
+    right: -100px !important;
+}
+#SafariKeywordSearchSettingsDiv___ {
+    z-index: 9999 !important;
+    position: absolute !important;
+    top: 50px !important;
+    left: 50px !important;
+    background-color: white !important;
+    border: 1px solid black !important;
+    font: 14px/18px helvetica !important;
+    color: black !important;
+    margin: 0 !important;
+    padding: 1em !important;
+}
+
+#SafariKeywordSearchSettingsDiv___ input.SafariKeywordSearchSettingsShortcut___ {
+    background-color: white !important;
+    border: 1px solid #666 !important;
+    font: 14px/18px helvetica !important;
+    color: black !important;
+    width: 5em !important;
+    margin: 0.2em !important;
+}
+
+#SafariKeywordSearchSettingsDiv___ input.SafariKeywordSearchSettingsExpansion___ {
+    background-color: white !important;
+    border: 1px solid #666 !important;
+    font: 14px/18px helvetica !important;
+    color: black !important;
+    width: 30em !important;
+    margin: 0.2em !important;
+}
