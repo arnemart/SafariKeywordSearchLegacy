@@ -39,6 +39,7 @@
             
         shortcut.setAttribute('class', 'SafariKeywordSearchSettingsShortcut___');
         expansion.setAttribute('class', 'SafariKeywordSearchSettingsExpansion___');
+        expansion.setAttribute('value', 'http://');
         deleteRowButton.setAttribute('type', 'button');
         deleteRowButton.setAttribute('value', 'Delete');
         deleteRowButton.addEventListener('click', function() {
@@ -52,10 +53,25 @@
     
     safari.self.addEventListener('message', function(message) {
         if (message.name == 'KeywordSearchSettings' && ! document.getElementById(settingsDivId)) {
-            var settings = message.message[0],
+            var unsortedSettings = message.message[0],
                 overlayDiv = document.createElement('div'),
                 settingsDiv = document.createElement('div'),
-                key;
+                tempArray = [],
+                settings = {},
+                key, i, j;
+            
+            for (key in unsortedSettings) {
+                if (unsortedSettings.hasOwnProperty(key)) {
+                    tempArray.push(key);
+                }
+            }
+            
+            tempArray.sort();
+            
+            for (i = 0, j = tempArray.length; i < j; i++) {
+                settings[tempArray[i]] = unsortedSettings[tempArray[i]];
+            }
+            
             settingsDiv.setAttribute('id', settingsDivId);    
             overlayDiv.setAttribute('id', overlayId);
             for (key in settings) {
