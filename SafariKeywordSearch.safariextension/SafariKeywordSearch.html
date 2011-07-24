@@ -40,7 +40,7 @@
             }
             return expansions;
         };
-        console.log(getExpansions());
+        
         safari.application.addEventListener('beforeNavigate', function(evt) {
             var url = evt.url,
                 expandedUrl,
