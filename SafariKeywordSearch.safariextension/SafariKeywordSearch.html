@@ -84,7 +84,7 @@
             
             if (expandedUrl) {
                 evt.preventDefault();
-                safari.application.activeBrowserWindow.activeTab.url = expandedUrl;
+                evt.target.url = expandedUrl;
             }
         }, true);
         
