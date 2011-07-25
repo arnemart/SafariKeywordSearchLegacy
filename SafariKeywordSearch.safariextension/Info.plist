@@ -62,5 +62,7 @@
 	</dict>
 	<key>Update Manifest URL</key>
 	<string>http://safarikeywordsearch.aurlien.net/manifest.xml</string>
+	<key>Website</key>
+	<string>http://safarikeywordsearch.aurlien.net/</string>
 </dict>
 </plist>
