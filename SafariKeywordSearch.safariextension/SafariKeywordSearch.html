@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>SafariKeywordSearch</title>
+    <script src="punycode.js" type="text/javascript"></script>
     <script type="text/javascript">
         
         var key;
@@ -51,6 +52,7 @@
             }
             
             url = url.replace(/^\w{2,8}:\/\//, '').replace(/\/$/, '');
+            url = punycode.ToUnicode(unescape(url));
             
             for (var key in keywordExpansions) {
                 if (keywordExpansions.hasOwnProperty(key)) {
@@ -59,8 +61,8 @@
                         isKeywordExpansion = keywordExpansions[key].match('@@@');
                     
                     if (isKeywordExpansion) {
-                        matchRegex = new RegExp('^' + key + '%20.+');
-                        keyRegex = new RegExp('^' + key + '(%20)*');
+                        matchRegex = new RegExp('^' + key + ' .+');
+                        keyRegex = new RegExp('^' + key + '( )*');
                     } else {
                         matchRegex = new RegExp('^' + key + '$');
                     }
