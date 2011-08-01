@@ -50,38 +50,36 @@
             if (! url) {
                 return;
             }
-            
+
             url = url.replace(/^\w{2,8}:\/\//, '').replace(/\/$/, '');
             url = punycode.ToUnicode(unescape(url));
-            
-            for (var key in keywordExpansions) {
+
+            // matches [alphanumeric] [whitespace] [any]
+            var regex   = /([a-zA-Z0-9]+)\s+(.+)/;
+            var matches = regex.exec(url);
+
+            if (matches) {
+                var key = matches[1];
+                var str = matches[2];
+
                 if (keywordExpansions.hasOwnProperty(key)) {
-                    var matchRegex,
-                        keyRegex,
-                        isKeywordExpansion = keywordExpansions[key].match('@@@');
-                    
-                    if (isKeywordExpansion) {
-                        matchRegex = new RegExp('^' + key + ' .+');
-                        keyRegex = new RegExp('^' + key + '( )*');
-                    } else {
-                        matchRegex = new RegExp('^' + key + '$');
-                    }
-                        
-                    if (url.match(matchRegex)) {
-                        if (isKeywordExpansion) {
-                            expandedUrl = keywordExpansions[key].replace('@@@', url.replace(keyRegex, ''));
-                        } else {
-                            expandedUrl = keywordExpansions[key];
-                        }
-                        break;
-                    }
+                    var exp     = keywordExpansions[key];
+                    expandedUrl = exp.replace("@@@", str);
                 }
             }
-            
-            if (! expandedUrl && keywordExpansions['Default']) {
-                if (! url.match(/(^localhost|\/|\.|:)/)) {
-                    expandedUrl = keywordExpansions.Default.replace('@@@', url);
-                }
+            // if the user has a keyword without an expansion
+            // ex: 'google' => 'http://www.google.com'
+            else if (keywordExpansions.hasOwnProperty(url)) {
+                expandedUrl = keywordExpansions[url];
+            }
+
+            // default query
+            if (!expandedUrl &&
+                keywordExpansions.hasOwnProperty("Default") &&
+                !url.match(/(^localhost|\/|\.|:)/)) {
+
+                var exp     = keywordExpansions["Default"];
+                expandedUrl = exp.replace("@@@", url);
             }
             
             if (expandedUrl) {
