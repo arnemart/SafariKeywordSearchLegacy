@@ -55,18 +55,20 @@
             url = punycode.ToUnicode(unescape(url));
 
             // matches [alphanumeric] [whitespace] [any]
-            var regex   = /([a-zA-Z0-9]+)\s+(.+)/;
-            var matches = regex.exec(url);
-
+            var regex   = /([a-zA-Z0-9]+)\s+(.+)/,
+                matches = regex.exec(url),
+                exp, key, str;
+            
             if (matches) {
-                var key = matches[1];
-                var str = matches[2];
+                key = matches[1];
+                str = matches[2];
 
                 if (keywordExpansions.hasOwnProperty(key)) {
-                    var exp     = keywordExpansions[key];
+                    exp = keywordExpansions[key];
                     expandedUrl = exp.replace("@@@", str);
                 }
             }
+            
             // if the user has a keyword without an expansion
             // ex: 'google' => 'http://www.google.com'
             else if (keywordExpansions.hasOwnProperty(url)) {
@@ -78,7 +80,7 @@
                 keywordExpansions.hasOwnProperty("Default") &&
                 !url.match(/(^localhost|\/|\.|:)/)) {
 
-                var exp     = keywordExpansions["Default"];
+                exp = keywordExpansions["Default"];
                 expandedUrl = exp.replace("@@@", url);
             }
             
