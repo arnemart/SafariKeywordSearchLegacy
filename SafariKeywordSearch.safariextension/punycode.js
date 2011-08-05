@@ -23,9 +23,11 @@ var punycode = new function Punycode() {
         decode:function(input){
             var output = [], i=0, len=input.length,value,extra;
             while (i < len) {
-                value = input.charCodeAt(i++);
+                value = input.charCodeAt(i);
+                i++;
                 if ((value & 0xF800) === 0xD800) {
-                    extra = input.charCodeAt(i++);
+                    extra = input.charCodeAt(i);
+                    i++;
                     if ( ((value & 0xFC00) !== 0xD800) || ((extra & 0xFC00) !== 0xDC00) ) {
                         throw new RangeError("UTF-16(decode): Illegal UTF-16 sequence");
                     }
@@ -38,7 +40,8 @@ var punycode = new function Punycode() {
         encode:function(input){
             var output = [], i=0, len=input.length,value;
             while (i < len) {
-                value = input[i++];
+                value = input[i];
+                i++;
                 if ( (value & 0xF800) === 0xD800 ) {
                     throw new RangeError("UTF-16(encode): Illegal UTF-16 value");
                 }
@@ -51,7 +54,7 @@ var punycode = new function Punycode() {
             }
             return output.join("");
         }
-    }
+    };
 
     //Default parameters
     var initial_n = 0x80;
@@ -79,7 +82,7 @@ var punycode = new function Punycode() {
     // is undefined if flag is nonzero and digit d has no uppercase form. 
 
     function encode_digit(d, flag) {
-        return d + 22 + 75 * (d < 26) - ((flag != 0) << 5);
+        return d + 22 + 75 * (d < 26) - ((flag !== 0) << 5);
         //  0..25 map to ASCII a..z or A..Z 
         // 26..35 map to ASCII 0..9
     }
@@ -125,10 +128,14 @@ var punycode = new function Punycode() {
         // copy the first basic code points to the output.
 
         basic = input.lastIndexOf(delimiter);
-        if (basic < 0) basic = 0;
+        if (basic < 0) {
+            basic = 0;
+        }
 
         for (j = 0; j < basic; ++j) {
-            if(preserveCase) case_flags[output.length] = ( input.charCodeAt(j) -65 < 26);
+            if (preserveCase) {
+                case_flags[output.length] = ( input.charCodeAt(j) -65 < 26);
+            }
             if ( input.charCodeAt(j) >= 0x80) {
                 throw new RangeError("Illegal input >= 0x80");
             }
@@ -150,7 +157,8 @@ var punycode = new function Punycode() {
                     if (ic >= input_length) {
                         throw RangeError ("punycode_bad_input(1)");
                     }
-                    digit = decode_digit(input.charCodeAt(ic++));
+                    digit = decode_digit(input.charCodeAt(ic));
+                    ic++;
 
                     if (digit >= base) {
                         throw RangeError("punycode_bad_input(2)");
@@ -229,11 +237,7 @@ var punycode = new function Punycode() {
         // Handle the basic code points: 
         for (j = 0; j < input_length; ++j) {
             if ( input[j] < 0x80) {
-                output.push(
-                    String.fromCharCode(
-                        case_flags ? encode_basic(input[j], case_flags[j]) : input[j]
-                    )
-                );
+                output.push(String.fromCharCode(case_flags ? encode_basic(input[j], case_flags[j]) : input[j]));
             }
         }
 
@@ -242,7 +246,9 @@ var punycode = new function Punycode() {
         // h is the number of code points that have been handled, b is the
         // number of basic code points 
 
-        if (b > 0) output.push(delimiter);
+        if (b > 0) {
+            output.push(delimiter);
+        }
 
         // Main encoding loop: 
         //
@@ -252,7 +258,9 @@ var punycode = new function Punycode() {
 
             for (m = maxint, j = 0; j < input_length; ++j) {
                 ijv = input[j];
-                if (ijv >= n && ijv < m) m = ijv;
+                if (ijv >= n && ijv < m) {
+                    m = ijv;
+                }
             }
 
             // Increase delta enough to advance the decoder's
@@ -268,14 +276,19 @@ var punycode = new function Punycode() {
                 ijv = input[j];
 
                 if (ijv < n ) {
-                    if (++delta > maxint) return Error("punycode_overflow(2)");
+                    delta++;
+                    if (delta > maxint) {
+                        return Error("punycode_overflow(2)");
+                    }
                 }
 
                 if (ijv == n) {
                     // Represent delta as a generalized variable-length integer: 
                     for (q = delta, k = base; ; k += base) {
                         t = k <= bias ? tmin : k >= bias + tmax ? tmax : k - bias;
-                        if (q < t) break;
+                        if (q < t) {
+                            break;
+                        }
                         output.push( String.fromCharCode(encode_digit(t + (q - t) % (base - t), 0)) );
                         q = Math.floor( (q - t) / (base - t) );
                     }
@@ -286,35 +299,28 @@ var punycode = new function Punycode() {
                 }
             }
 
-            ++delta, ++n;
+            delta;
+            n;
         }
         return output.join("");
-    }
+    };
 
     this.ToASCII = function ( domain ) {
         var domain_array = domain.split(".");
         var out = [];
         for (var i=0; i < domain_array.length; ++i) {
             var s = domain_array[i];
-            out.push(
-                s.match(/[^A-Za-z0-9-]/) ?
-                "xn--" + punycode.encode(s) :
-                s
-            );
+            out.push(s.match(/[^A-Za-z0-9-]/) ? "xn--" + punycode.encode(s) : s);
         }
         return out.join(".");
-    }
+    };
     this.ToUnicode = function ( domain ) {
         var domain_array = domain.split(".");
         var out = [];
         for (var i=0; i < domain_array.length; ++i) {
             var s = domain_array[i];
-            out.push(
-                s.match(/^xn--/) ?
-                punycode.decode(s.slice(4)) :
-                s
-            );
+            out.push(s.match(/^xn--/) ? punycode.decode(s.slice(4)) : s);
         }
         return out.join(".");
-    }
+    };
 }();
