@@ -1,7 +1,7 @@
 Safari Keyword Search
 =====================
 
-This is a simple Safari extension to enable keyword search from the address bar. The following searches are included:
+This is a simple extension for Safari 5.1 and above to enable keyword search from the address bar. The following searches are included:
 
 - **a**: amazon.com
 - **down**: downforeveryoneorjustme.com
