@@ -84,9 +84,13 @@
                 expandedUrl = exp.replace("@@@", url);
             }
             
-            if (expandedUrl) {
+            // Handle javascript expansions
+            if (expandedUrl && expandedUrl.match(/^javascript:/)) {
                 evt.preventDefault();
-                evt.target.url = expandedUrl;
+                safari.application.activeBrowserWindow.activeTab.page.dispatchMessage('KeywordSearchEvalJS', [expandedUrl.replace(/^javascript:/, ''), evt.target.url]);
+            } else if (expandedUrl) {
+                evt.preventDefault();
+                evt.target.url = expandedUrl.replace(/ /g, '+');
             }
         }, true);
         
