@@ -55,14 +55,14 @@
             url = punycode.ToUnicode(unescape(url));
 
             // matches [alphanumeric] [whitespace] [any]
-            var regex   = /([a-zA-Z0-9]+)\s+(.+)/,
+            var regex   = /^([a-zA-Z0-9]+)\s+(.+)/,
                 matches = regex.exec(url),
                 exp, key, str;
             
             if (matches) {
                 key = matches[1];
                 str = matches[2];
-
+                
                 if (keywordExpansions.hasOwnProperty(key)) {
                     exp = keywordExpansions[key];
                     expandedUrl = exp.replace("@@@", str);
