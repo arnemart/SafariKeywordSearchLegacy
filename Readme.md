@@ -18,6 +18,12 @@ To edit or delete these, or add your own, right-click any web page and select �
 
 The url for the `Default` keyword is used when no other keyword is provided, and what is entered into the address bar doesn't look like a URL. This is set to Googles “I am feeling lucky” search by default.
 
+Limitations
+-----------
+
+- The search term cannot contain a colon symbol (:), as this makes Safari believe something is wrong with the URL protocol.
+- Preferably, the settings should have been in the Extensions tab of the Safari preferences window, but the API for this is currently too limited.
+
 Installation
 ------------
 
