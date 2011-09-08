@@ -27,6 +27,6 @@ Limitations
 Installation
 ------------
 
-1. Click the “Download”-button and download the file “SafariKeywordSearch.safariextz”
-2. Double-click it
+1. Click the “Download”-button and download the extension file
+2. Double-click it to install
 3. There is no step 3 :-)
