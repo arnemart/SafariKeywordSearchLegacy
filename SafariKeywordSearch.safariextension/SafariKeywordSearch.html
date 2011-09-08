@@ -90,6 +90,9 @@
                 safari.application.activeBrowserWindow.activeTab.page.dispatchMessage('KeywordSearchEvalJS', [expandedUrl.replace(/^javascript:/, ''), evt.target.url]);
             } else if (expandedUrl) {
                 evt.preventDefault();
+                if (expandedUrl.match('google')) {
+                    expandedUrl = expandedUrl.replace(/(site|cache)=/g, '$1:');
+                }
                 evt.target.url = expandedUrl;
             }
         }, true);
