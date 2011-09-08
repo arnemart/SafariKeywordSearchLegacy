@@ -26,7 +26,7 @@
                     gm: 'http://maps.google.com/maps?oi=map&q=@@@',
                     imdb: 'http://imdb.com/find?s=all&q=@@@',
                     so: 'http://stackoverflow.com/search?q=@@@',
-                    w: 'http://en.wikipedia.org/wiki/Special:Search/@@@',
+                    w: 'http://en.wikipedia.org/wiki/Special:Search/%%%',
                     wa: 'http://www.wolframalpha.com/input/?i=@@@',
                     y: 'http://youtube.com/results?search_query=@@@'
                 };
@@ -65,7 +65,7 @@
                 
                 if (keywordExpansions.hasOwnProperty(key)) {
                     exp = keywordExpansions[key];
-                    expandedUrl = exp.replace("@@@", str);
+                    expandedUrl = exp.replace('%%%', str).replace('@@@', str.replace(' ', '+'));
                 }
             }
             
@@ -77,11 +77,11 @@
 
             // default query
             if (!expandedUrl &&
-                keywordExpansions.hasOwnProperty("Default") &&
+                keywordExpansions.hasOwnProperty('Default') &&
                 !url.match(/(^localhost|\/|\.|:)/)) {
 
-                exp = keywordExpansions["Default"];
-                expandedUrl = exp.replace("@@@", url);
+                exp = keywordExpansions['Default'];
+                expandedUrl = exp.replace('%%%', url).replace('@@@', url.replace(' ', '+'));
             }
             
             // Handle javascript expansions
@@ -90,7 +90,7 @@
                 safari.application.activeBrowserWindow.activeTab.page.dispatchMessage('KeywordSearchEvalJS', [expandedUrl.replace(/^javascript:/, ''), evt.target.url]);
             } else if (expandedUrl) {
                 evt.preventDefault();
-                evt.target.url = expandedUrl.replace(/ /g, '+');
+                evt.target.url = expandedUrl;
             }
         }, true);
         
