@@ -65,7 +65,7 @@
                 
                 if (keywordExpansions.hasOwnProperty(key)) {
                     exp = keywordExpansions[key];
-                    expandedUrl = exp.replace('%%%', str).replace('@@@', str.replace(' ', '+'));
+                    expandedUrl = exp.replace('%%%', str).replace('@@@', str.replace(/ /g, '+'));
                 }
             }
             
@@ -81,7 +81,7 @@
                 !url.match(/(^localhost|\/|\.|:)/)) {
 
                 exp = keywordExpansions['Default'];
-                expandedUrl = exp.replace('%%%', url).replace('@@@', url.replace(' ', '+'));
+                expandedUrl = exp.replace('%%%', url).replace('@@@', url.replace(/ /g, '+'));
             }
             
             // Handle javascript expansions
