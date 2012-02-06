@@ -4,6 +4,7 @@ Safari Keyword Search
 This is a simple extension for Safari 5.1 and above to enable keyword searches. This is a simple but powerful feature that e.g lets you search Google for pages about monkeys by typing `g monkey` in the address bar. The following search engines are included:
 
 - **a**: amazon.com
+- **d**: duckduckgo.com
 - **down**: downforeveryoneorjustme.com
 - **e**: ebay.com
 - **g**: google.com
