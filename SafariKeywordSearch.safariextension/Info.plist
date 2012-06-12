@@ -5,7 +5,7 @@
 	<key>Author</key>
 	<string>Arne Martin Aurlien</string>
 	<key>Builder Version</key>
-	<string>7534.53.10</string>
+	<string>7536.16</string>
 	<key>CFBundleDisplayName</key>
 	<string>SafariKeywordSearch</string>
 	<key>CFBundleIdentifier</key>
@@ -13,9 +13,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.6</string>
+	<string>1.7</string>
 	<key>CFBundleVersion</key>
-	<string>7</string>
+	<string>8</string>
 	<key>Chrome</key>
 	<dict>
 		<key>Context Menu Items</key>

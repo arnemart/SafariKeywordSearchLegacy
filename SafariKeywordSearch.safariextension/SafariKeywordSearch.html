@@ -9,7 +9,8 @@
         var key;
         //localStorage.clear();
         var getExpansions = function() {
-            var expansions = {};
+            var expansions = {},
+                key;
             if (localStorage.getItem('___keywordExpansionsAreSaved')) {
                 for (key in localStorage) {
                     if (key !== '___keywordExpansionsAreSaved' && localStorage.hasOwnProperty(key)) {
@@ -46,8 +47,9 @@
         safari.application.addEventListener('beforeNavigate', function(evt) {
             var url = evt.url,
                 expandedUrl,
-                keywordExpansions = getExpansions();
-            
+                keywordExpansions = getExpansions(),
+                regex;
+
             if (! url) {
                 return;
             }
@@ -55,11 +57,15 @@
             url = url.replace(/^\w{2,8}:\/\//, '').replace(/\/$/, '');
             url = punycode.ToUnicode(unescape(url)).replace('&', '%26');
 
-            // matches [alphanumeric] [whitespace] [any]
-            var regex   = /^([a-zA-Z0-9]+)\s+(.+)/,
-                matches = regex.exec(url),
-                exp, key, str;
+            if (navigator.appVersion.match(/Version\/6.\d Safari/)) {
+                regex = /google\.[a-z\.]{2,5}\/search\?client=safari.*?&q=([a-zA-Z0-9]+)\+(.+)&ie=UTF-8/;
+            } else {
+                regex = /^([a-zA-Z0-9]+)\s+(.+)/;
+            }
             
+            var matches = regex.exec(url),
+                exp, key, str;
+
             if (matches) {
                 key = matches[1];
                 str = matches[2];
@@ -108,7 +114,8 @@
             if (message.name == 'SaveKeywordSearchSettings') {
                 localStorage.clear();
                 localStorage.setItem('___keywordExpansionsAreSaved', '1');
-                var keywordExpansions = message.message[0];
+                var keywordExpansions = message.message[0],
+                    key;
                 for (key in keywordExpansions) {
                     if (keywordExpansions.hasOwnProperty(key)) {
                         localStorage.setItem(key, keywordExpansions[key]);
