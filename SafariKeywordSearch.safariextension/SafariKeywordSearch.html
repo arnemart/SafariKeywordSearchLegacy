@@ -7,6 +7,7 @@
     <script type="text/javascript">
         
         var key;
+        var isSafari6 = navigator.appVersion.match(/Version\/6.\d Safari/);
         //localStorage.clear();
         var getExpansions = function() {
             var expansions = {},
@@ -48,49 +49,63 @@
             var url = evt.url,
                 expandedUrl,
                 keywordExpansions = getExpansions(),
-                regex;
+                regex,
+                matches,
+                exp, key, str;
 
             if (! url) {
                 return;
             }
 
             url = url.replace(/^\w{2,8}:\/\//, '').replace(/\/$/, '');
-            url = punycode.ToUnicode(unescape(url)).replace('&', '%26');
 
-            if (navigator.appVersion.match(/Version\/6.\d Safari/)) {
+            if (isSafari6) {
                 regex = /google\.[a-z\.]{2,5}\/search\?client=safari.*?&q=([a-zA-Z0-9]+)\+(.+)&ie=UTF-8/;
-            } else {
-                regex = /^([a-zA-Z0-9]+)\s+(.+)/;
-            }
-            
-            var matches = regex.exec(url),
-                exp, key, str;
+                matches = regex.exec(url);
 
-            if (matches) {
-                key = matches[1];
-                str = matches[2];
-                
-                if (keywordExpansions.hasOwnProperty(key)) {
-                    exp = keywordExpansions[key];
-                    expandedUrl = exp.replace('%%%', str).replace('@@@', str.replace(/ /g, '+'));
+                if (matches) {
+                    key = matches[1];
+                    str = matches[2];
+
+                    if (keywordExpansions.hasOwnProperty(key)) {
+                        exp = keywordExpansions[key];
+                        expandedUrl = exp.replace('%%%', str.replace(/\+/g, '%20')).replace('@@@', str);
+                    }
+                }
+
+                // if the user has a keyword without an expansion
+                // ex: 'google' => 'http://www.google.com'
+                else if (keywordExpansions.hasOwnProperty(url)) {
+                    expandedUrl = keywordExpansions[url];
+                }
+            } else {
+                url = punycode.ToUnicode(unescape(url)).replace('&', '%26');
+                regex = /^([a-zA-Z0-9]+)\s+(.+)/;
+                matches = regex.exec(url);
+
+                if (matches) {
+                    key = matches[1];
+                    str = matches[2];
+
+                    if (keywordExpansions.hasOwnProperty(key)) {
+                        exp = keywordExpansions[key];
+                        expandedUrl = exp.replace('%%%', str).replace('@@@', str.replace(/ /g, '+'));
+                    }
+                }
+
+                // if the user has a keyword without an expansion
+                // ex: 'google' => 'http://www.google.com'
+                else if (keywordExpansions.hasOwnProperty(url)) {
+                    expandedUrl = keywordExpansions[url];
+                }
+
+                // default query
+                if (!expandedUrl && keywordExpansions.hasOwnProperty('Default') && !url.match(/(^localhost|\/|\.|:)/)) {
+                    exp = keywordExpansions['Default'];
+                    expandedUrl = exp.replace('%%%', url).replace('@@@', url.replace(/ /g, '+'));
                 }
             }
-            
-            // if the user has a keyword without an expansion
-            // ex: 'google' => 'http://www.google.com'
-            else if (keywordExpansions.hasOwnProperty(url)) {
-                expandedUrl = keywordExpansions[url];
-            }
 
-            // default query
-            if (!expandedUrl &&
-                keywordExpansions.hasOwnProperty('Default') &&
-                !url.match(/(^localhost|\/|\.|:)/)) {
-
-                exp = keywordExpansions['Default'];
-                expandedUrl = exp.replace('%%%', url).replace('@@@', url.replace(/ /g, '+'));
-            }
-            
             // Handle javascript expansions
             if (expandedUrl && expandedUrl.match(/^javascript:/)) {
                 evt.preventDefault();
