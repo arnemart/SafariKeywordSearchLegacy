@@ -45,6 +45,25 @@
             return expansions;
         };
         
+        safari.application.addEventListener('beforeSearch', function(evt) {
+            var query = evt.query,
+                parts = evt.query.split(' '),
+                key = parts[0],
+                search;
+            
+            if (keywordExpansions.hasOwnProperty(key)) {
+                search = parts.slice(1).join(' ');
+            } else if (keywordExpansions.hasOwnProperty('default')) {
+                key = 'default';
+                search = query;
+            } else {
+                return;
+            }
+            
+            
+            
+        }, false);
+        
         safari.application.addEventListener('beforeNavigate', function(evt) {
             var url = evt.url,
                 expandedUrl,
