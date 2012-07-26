@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>untitled</title>
+    <style type="text/css" media="screen">
+        body {
+            background-color: white;
+            color: #333;
+            font-family: 'Helvetica Neue', Helvetica, sans-serif; 
+            font-weight: 300;
+            margin: 0;
+            padding: 0;
+            min-width: 50em;
+        }
+        #header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2.5em;
+            padding: 1em 1.5em;
+            background-color: #415F71;
+            color: white;
+        }
+        #header h1 {
+            margin: 0;
+            font-weight: 300;
+        }
+        #sidebar {
+            position: absolute;
+            width: 20em;
+            left: 0;
+            top: 4.5em;
+            bottom: 0;
+            background-color: #eee;
+        }
+        #sidebar ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 2.7em;
+            overflow: scroll;
+        }
+        #sidebar li {
+            cursor: pointer;
+            margin: 0;
+            padding: 0.5em 0.7em;
+            background-color: white
+        }
+        #sidebar li:nth-child(odd) {
+            background-color: #eee;
+        }
+        #sidebar li.selected {
+            background: #666;
+            color: #eee;
+        }
+        #sidebar li.selected .url {
+            color: #ccc;
+        }
+        #sidebar .keyword {
+            font-weight: bold;
+        }
+        #sidebar .url {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-style: italic;
+            color: #999;
+            font-size: 0.7em;
+        }
+        #sidebar .controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1.7em;
+            padding: 0.5em 0.7em;
+            background-color: #dadada;
+        }
+        #details {
+            display: none;
+            position: absolute;
+            top: 4.5em;
+            right: 0;
+            bottom: 0;
+            left: 20em;
+            border-left: thin solid black;
+        }
+        #details > div {
+            padding: 2em 3em;
+        }
+        #details input {
+            font-size: 1.5em;
+            width: 10em;
+        }
+        #details textarea {
+            font-family: 'Menlo', monospace;
+            width: 40em;
+            height: 5em;
+        }
+        #details label {
+            display: block;
+            margin-bottom: 1em;
+        }
+        #save {
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+
+<div id="header">
+    <h1>Safari Keyword Search Settings</h1>
+</div>
+
+<div id="sidebar">
+    <ul id="searches">
+        
+    </ul>
+    <div class="controls">
+        <button id="add">+</button> <button id="remove">-</button>
+        <button id="export">Export</button> <button id="import">Import</button>
+    </div>
+</div>
+
+<div id="details">
+    <div>
+        <label>Keyword<br /><input type="text" id="keyword" /></label>
+        <label>URL expansion<br /><textarea id="url"></textarea></label>
+        <input type="hidden" id="oldKey" />
+        <button id="save">Save</button>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var expansions;
+    
+    var saveSearch = function(oldKey, key, url) {
+        expansions[key] = url;
+        safari.self.tab.dispatchMessage('KeywordSearchSaveSearch', [oldKey, key, url]);
+    };
+    
+    var showEditor = function(key) {
+        var details = document.getElementById('details'),
+            url = expansions[key] || '';
+        if (details.style.display !== 'block') {
+            details.style.display = 'block';
+        }
+        document.getElementById('keyword').value = key;
+        document.getElementById('oldKey').value = key;
+        document.getElementById('url').value = url;
+    };
+    
+    var updateSelected = function(key, url) {
+        var selected = document.querySelector('#searches li.selected'),
+            keywordElement = selected.querySelector('.keyword'),
+            urlElement = selected.querySelector('.url');
+        selected.setAttribute('data-key', key);
+        selected.setAttribute('data-url', url);
+        keywordElement.innerText = key;
+        urlElement.innerText = url;
+    };
+    
+    var setSelected = function(key) {
+        var searchRows = document.querySelectorAll('#searches li'),
+            i, j, row, selected;
+        for (i = 0, j = searchRows.length; i < j; i++) {
+            row = searchRows[i];
+            rowKey = row.getAttribute('data-key');
+            selected = row.className === 'selected';
+            if (rowKey === key && !selected) {
+                row.className = 'selected';
+                row.scrollIntoViewIfNeeded();
+                showEditor(key);
+            } else if (rowKey !== key) {
+                row.className = '';
+            }
+        }
+    };
+    
+    var addSearch = function(key, url, active) {
+        var searches = document.getElementById('searches'),
+            newSearch = document.createElement('li');
+        newSearch.innerHTML = '<div class="keyword">' + key + '</div>' +
+            '<div class="url">' + url + '</div>';
+        newSearch.setAttribute('data-key', key);
+        newSearch.setAttribute('data-url', url);
+        newSearch.addEventListener('click', function() {
+            var key = newSearch.getAttribute('data-key'),
+                url = newSearch.getAttribute('data-url');
+            setSelected(key);
+            showEditor(key);
+        }, false);
+        searches.appendChild(newSearch);
+        if (active) {
+            setSelected(key);
+        }
+    };
+    
+    var deleteSearch = function(key) {
+        delete expansions[key];
+        safari.self.tab.dispatchMessage('KeywordSearchDeleteSearch', [key]);
+    };
+    
+    var deleteSelected = function() {
+        var searches = document.getElementById('searches'),
+            selected = document.querySelector('#searches li.selected'),
+            key = selected.getAttribute('data-key');
+        searches.removeChild(selected);
+        deleteSearch(key);
+        document.getElementById('details').style.display = 'none';
+    };
+    
+    var loadExpansions = function(expansions) {
+        document.getElementById('searches').innerHTML = '';
+        var selected = false,
+            key;
+        if (expansions.hasOwnProperty('Default')) {
+            addSearch('Default', expansions['Default'], true);
+            selected = true;
+        }
+
+        for (key in expansions) {
+            if (key !== 'Default' && expansions.hasOwnProperty(key)) {
+                if (!selected) {
+                    addSearch(key, expansions[key], true);
+                    selected = true;
+                } else {
+                    addSearch(key, expansions[key], false);
+                }
+            }
+        }
+    };
+    
+    var serializeExpansions = function() {
+        var expansions = {};
+        var searchRows = document.querySelectorAll('#searches li'),
+            i, j;
+        for (i = 0, j = searchRows.length; i < j; i++) {
+            expansions[searchRows[i].getAttribute('data-key')] = searchRows[i].getAttribute('data-url');
+        }
+        return expansions;
+    };
+    
+    var exportSettings = function() {
+        prompt('Copy the text below and store it in a text file on, like, yor dropbox or something.', JSON.stringify(serializeExpansions()));
+    };
+    
+    var importSettings = function() {
+        var newSettings = prompt('Paste your settings here:', '');
+        try {
+            var settings = JSON.parse(newSettings);
+            loadExpansions(settings);
+            safari.self.tab.dispatchMessage('KeywordSearchSaveSearches', [settings]);
+        } catch (e) {
+            alert('Syntax error in settings. Try again.');
+        }
+    };
+    
+    document.getElementById('save').addEventListener('click', function() {
+        var key = document.getElementById('keyword').value,
+            oldKey = document.getElementById('oldKey').value,
+            url = document.getElementById('url').value;
+        saveSearch(oldKey, key, url);
+        updateSelected(key, url);
+    }, false);
+    
+    document.getElementById('add').addEventListener('click', function() {
+        addSearch('key', '', true);
+    }, false);
+    
+    document.getElementById('remove').addEventListener('click', function() {
+        deleteSelected();
+    }, false);
+    
+    document.getElementById('export').addEventListener('click', exportSettings, false);
+    
+    document.getElementById('import').addEventListener('click', importSettings, false);
+    
+    safari.self.tab.dispatchMessage('KeywordSearchLoadSearches');
+    
+    safari.self.addEventListener('message', function(evt) {
+        if (evt.name == 'KeywordSearchHereAreTheSearches') {
+            expansions = evt.message[0];
+            loadExpansions(expansions);
+        }
+    }, false);
+
+</script>
+
+</body>
+</html>
