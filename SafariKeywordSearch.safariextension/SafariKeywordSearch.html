@@ -64,11 +64,29 @@
                     safari.application.activeBrowserWindow.activeTab.page.dispatchMessage('KeywordSearchHereAreTheSearches', [getExpansions()]);
                     break;
             }
-        }, true);
-
+        }, false);
+        
+        safari.application.addEventListener('validate', function(evt) {
+            if (!safari.extension.settings.enableMenuItem) {
+                evt.target.disabled = true;
+            }
+        }, false);
+        
+        safari.application.addEventListener('command', function(evt) {
+            if (evt.command == 'KeywordSearchSettings') {
+                var manageURL = safari.extension.baseURI + 'settings.html',
+                    currentWindow = safari.application.activeBrowserWindow,
+                    currentTab = currentWindow.activeTab;
+                if (currentTab.url === '') {
+                    currentTab.url = manageURL;
+                } else {
+                    currentWindow.openTab('foreground').url = manageURL;
+                }
+            }
+        }, false);
 
         // Use the new beforeSearch event on Safari 6
-        if (isSafari6) {
+        if (navigator.appVersion.match(/Version\/6.\d Safari/)) {
             safari.application.addEventListener('beforeSearch', function(evt) {
                 var query = evt.query,
                     keywordExpansions = getExpansions(),
@@ -77,20 +95,17 @@
                     search,
                     url;
                 if (keywordExpansions.hasOwnProperty(key)) {
-                    search = escape(parts.slice(1).join(' '));
+                    search = parts.slice(1).join(' ');
                 } else if (keywordExpansions.hasOwnProperty('Default')) {
                     key = 'Default';
-                    search = escape(query);
-                } else if (keywordExpansions.hasOwnProperty('default')) {
-                    key = 'default';
-                    search = escape(query);
+                    search = query;
                 } else {
                     return;
                 }
 
                 evt.preventDefault();
 
-                url = keywordExpansions[key].replace('%%%', search.replace(/\+/g, '%20')).replace('@@@', search);
+                url = keywordExpansions[key].replace('%%%', search.replace(/ /g, '%20')).replace('@@@', search.replace(/ /g, '+'));
 
                 // Handle javascript expansions
                 if (url.match(/^javascript:/)) {
@@ -158,27 +173,8 @@
                     }
                     evt.target.url = expandedUrl;
                 }
-            }, true);
+            }, false);
         }
-        
-        safari.application.addEventListener('validate', function(evt) {
-            if (!safari.extension.settings.enableMenuItem) {
-                evt.target.disabled = true;
-            }
-        }, false);
-        
-        safari.application.addEventListener('command', function(evt) {
-            if (evt.command == 'KeywordSearchSettings') {
-                var manageURL = safari.extension.baseURI + 'settings.html',
-                    currentWindow = safari.application.activeBrowserWindow,
-                    currentTab = currentWindow.activeTab;
-                if (currentTab.url === '') {
-                    currentTab.url = manageURL;
-                } else {
-                    currentWindow.openTab('foreground').url = manageURL;
-                }
-            }
-        }, true);
         
     </script>
 </head>
