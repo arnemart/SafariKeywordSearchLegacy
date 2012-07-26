@@ -4,100 +4,86 @@
     <meta charset="UTF-8">
     <title>SafariKeywordSearch</title>
     <script src="punycode.js" type="text/javascript"></script>
+    <script src="utils.js" type="text/javascript"></script>
     <script type="text/javascript">
-        
-        var key;
+
         var isSafari6 = navigator.appVersion.match(/Version\/6.\d Safari/);
-        //localStorage.clear();
-        var getExpansions = function() {
-            var expansions = {},
-                key;
-            if (localStorage.getItem('___keywordExpansionsAreSaved')) {
-                for (key in localStorage) {
-                    if (key !== '___keywordExpansionsAreSaved' && localStorage.hasOwnProperty(key)) {
-                        expansions[key] = localStorage.getItem(key);
+
+        safari.application.addEventListener('message', function(evt) {
+            switch(evt.name) {
+                case 'KeywordSearchSaveSearches':
+                    saveExpansions(evt.message[0]);
+                    break;
+                case 'KeywordSearchSaveSearch':
+                    if (evt.message[0] !== evt.message[1]) {
+                        localStorage.removeItem(evt.message[0]);
                     }
+                    localStorage.setItem(evt.message[1], evt.message[2]);
+                    break;
+                case 'KeywordSearchDeleteSearch':
+                    localStorage.removeItem(evt.message[0]);
+                    break;
+                case 'KeywordSearchLoadSearches':
+                    safari.application.activeBrowserWindow.activeTab.page.dispatchMessage('KeywordSearchHereAreTheSearches', [getExpansions()]);
+                    break;
+            }
+        }, true);
+
+
+        // Use the new beforeSearch event on Safari 6
+        if (isSafari6) {
+            safari.application.addEventListener('beforeSearch', function(evt) {
+                var query = evt.query,
+                    keywordExpansions = getExpansions(),
+                    parts = evt.query.split(' '),
+                    key = parts[0],
+                    search,
+                    url;
+                if (keywordExpansions.hasOwnProperty(key)) {
+                    search = escape(parts.slice(1).join(' '));
+                } else if (keywordExpansions.hasOwnProperty('Default')) {
+                    key = 'Default';
+                    search = escape(query);
+                } else if (keywordExpansions.hasOwnProperty('default')) {
+                    key = 'default';
+                    search = escape(query);
+                } else {
+                    return;
                 }
-            } else {
-                expansions = {
-                    a: 'http://www.amazon.com/exec/obidos/search-handle-url/index%3Dblended%26field-keywords%3D@@@',
-                    d: 'http://duckduckgo.com/?q=@@@',
-                    down: 'http://downforeveryoneorjustme.com/@@@',
-                    e: 'http://search.ebay.com/search/search.dll?satitle=@@@',
-                    g: 'http://www.google.com/search?q=@@@',
-                    Default: "http://www.google.com/search?q=@@@&btnI=I'm+Feeling+Lucky",
-                    gm: 'http://maps.google.com/maps?oi=map&q=@@@',
-                    imdb: 'http://imdb.com/find?s=all&q=@@@',
-                    so: 'http://stackoverflow.com/search?q=@@@',
-                    w: 'http://en.wikipedia.org/wiki/Special:Search/%%%',
-                    wa: 'http://www.wolframalpha.com/input/?i=@@@',
-                    y: 'http://youtube.com/results?search_query=@@@'
-                };
 
-                localStorage.setItem('___keywordExpansionsAreSaved', '1');
+                evt.preventDefault();
 
-                for (key in expansions) {
-                    if (expansions.hasOwnProperty(key)) {
-                        localStorage.setItem(key, expansions[key]);
+                url = keywordExpansions[key].replace('%%%', search.replace(/\+/g, '%20')).replace('@@@', search);
+
+                // Handle javascript expansions
+                if (url.match(/^javascript:/)) {
+                    evt.preventDefault();
+                    safari.application.activeBrowserWindow.activeTab.page.dispatchMessage('KeywordSearchEvalJS', [url.replace(/^javascript:/, ''), evt.target.url]);
+                } else {
+                    evt.preventDefault();
+                    if (url.match('google')) {
+                        url = url.replace(/(site|cache)=/g, '$1:');
                     }
-                }
-            }
-            return expansions;
-        };
-        
-        safari.application.addEventListener('beforeSearch', function(evt) {
-            var query = evt.query,
-                parts = evt.query.split(' '),
-                key = parts[0],
-                search;
-            
-            if (keywordExpansions.hasOwnProperty(key)) {
-                search = parts.slice(1).join(' ');
-            } else if (keywordExpansions.hasOwnProperty('default')) {
-                key = 'default';
-                search = query;
-            } else {
-                return;
-            }
-            
-            
-            
-        }, false);
-        
-        safari.application.addEventListener('beforeNavigate', function(evt) {
-            var url = evt.url,
-                expandedUrl,
-                keywordExpansions = getExpansions(),
-                regex,
-                matches,
-                exp, key, str;
-
-            if (! url) {
-                return;
-            }
-
-            url = url.replace(/^\w{2,8}:\/\//, '').replace(/\/$/, '');
-
-            if (isSafari6) {
-                regex = /google\.[a-z\.]{2,5}\/search\?client=safari.*?&q=([a-zA-Z0-9]+)\+(.+)&ie=UTF-8/;
-                matches = regex.exec(url);
-
-                if (matches) {
-                    key = matches[1];
-                    str = matches[2];
-
-                    if (keywordExpansions.hasOwnProperty(key)) {
-                        exp = keywordExpansions[key];
-                        expandedUrl = exp.replace('%%%', str.replace(/\+/g, '%20')).replace('@@@', str);
-                    }
+                    evt.target.url = url;
                 }
 
-                // if the user has a keyword without an expansion
-                // ex: 'google' => 'http://www.google.com'
-                else if (keywordExpansions.hasOwnProperty(url)) {
-                    expandedUrl = keywordExpansions[url];
+            }, false);
+        } else {
+        // Use the new old beforeNavigate event on Safari 5
+            safari.application.addEventListener('beforeNavigate', function(evt) {
+                var url = evt.url,
+                    expandedUrl,
+                    keywordExpansions = getExpansions(),
+                    regex,
+                    matches,
+                    exp, key, str;
+
+                if (! url) {
+                    return;
                 }
-            } else {
+
+                url = url.replace(/^\w{2,8}:\/\//, '').replace(/\/$/, '');
+
                 url = punycode.ToUnicode(unescape(url)).replace('&', '%26');
                 regex = /^([a-zA-Z0-9]+)\s+(.+)/;
                 matches = regex.exec(url);
@@ -123,41 +109,39 @@
                     exp = keywordExpansions['Default'];
                     expandedUrl = exp.replace('%%%', url).replace('@@@', url.replace(/ /g, '+'));
                 }
-            }
 
-            // Handle javascript expansions
-            if (expandedUrl && expandedUrl.match(/^javascript:/)) {
-                evt.preventDefault();
-                safari.application.activeBrowserWindow.activeTab.page.dispatchMessage('KeywordSearchEvalJS', [expandedUrl.replace(/^javascript:/, ''), evt.target.url]);
-            } else if (expandedUrl) {
-                evt.preventDefault();
-                if (expandedUrl.match('google')) {
-                    expandedUrl = expandedUrl.replace(/(site|cache)=/g, '$1:');
+                // Handle javascript expansions
+                if (expandedUrl && expandedUrl.match(/^javascript:/)) {
+                    evt.preventDefault();
+                    safari.application.activeBrowserWindow.activeTab.page.dispatchMessage('KeywordSearchEvalJS', [expandedUrl.replace(/^javascript:/, ''), evt.target.url]);
+                } else if (expandedUrl) {
+                    evt.preventDefault();
+                    if (expandedUrl.match('google')) {
+                        expandedUrl = expandedUrl.replace(/(site|cache)=/g, '$1:');
+                    }
+                    evt.target.url = expandedUrl;
                 }
-                evt.target.url = expandedUrl;
+            }, true);
+        }
+        
+        safari.application.addEventListener('validate', function(evt) {
+            if (!safari.extension.settings.enableMenuItem) {
+                evt.target.disabled = true;
             }
-        }, true);
+        }, false);
         
         safari.application.addEventListener('command', function(evt) {
             if (evt.command == 'KeywordSearchSettings') {
-                safari.application.activeBrowserWindow.activeTab.page.dispatchMessage('KeywordSearchSettings', [getExpansions()]);
+                var manageURL = safari.extension.baseURI + 'settings.html',
+                    currentWindow = safari.application.activeBrowserWindow,
+                    currentTab = currentWindow.activeTab;
+                if (currentTab.url === '') {
+                    currentTab.url = manageURL;
+                } else {
+                    currentWindow.openTab('foreground').url = manageURL;
+                }
             }
         }, true);
-        
-        safari.application.addEventListener('message', function(message) {
-            if (message.name == 'SaveKeywordSearchSettings') {
-                localStorage.clear();
-                localStorage.setItem('___keywordExpansionsAreSaved', '1');
-                var keywordExpansions = message.message[0],
-                    key;
-                for (key in keywordExpansions) {
-                    if (keywordExpansions.hasOwnProperty(key)) {
-                        localStorage.setItem(key, keywordExpansions[key]);
-                    }
-                }
-                
-            }
-        }, false);
         
     </script>
 </head>
