@@ -5,7 +5,7 @@
 	<key>Author</key>
 	<string>Arne Martin Aurlien</string>
 	<key>Builder Version</key>
-	<string>7536.19</string>
+	<string>8536.25</string>
 	<key>CFBundleDisplayName</key>
 	<string>SafariKeywordSearch</string>
 	<key>CFBundleIdentifier</key>
@@ -13,14 +13,16 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.8</string>
+	<string>2.0</string>
 	<key>CFBundleVersion</key>
-	<string>9</string>
+	<string>10</string>
 	<key>Chrome</key>
 	<dict>
 		<key>Context Menu Items</key>
 		<array>
 			<dict>
+				<key>Command</key>
+				<string>KeywordSearchSettings</string>
 				<key>Identifier</key>
 				<string>KeywordSearchSettings</string>
 				<key>Title</key>
@@ -41,10 +43,6 @@
 				<string>SafariKeywordSearch.js</string>
 			</array>
 		</dict>
-		<key>Stylesheets</key>
-		<array>
-			<string>SafariKeywordSearch.css</string>
-		</array>
 	</dict>
 	<key>Description</key>
 	<string>Enables keyword search from the address bar in Safari.</string>
