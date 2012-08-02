@@ -143,6 +143,22 @@
 <script type="text/javascript">
     var expansions;
     
+    var sortExpansions = function(expansions) {
+        var result = {},
+            keys = [],
+            key;
+        for (key in expansions) {
+            if (expansions.hasOwnProperty(key)) {
+                keys.push(key);
+            }
+        }
+        keys = keys.sort();
+        keys.forEach(function(key) {
+            result[key] = expansions[key];
+        });
+        return result;
+    };
+    
     var saveSearch = function(oldKey, key, url) {
         expansions[key] = url;
         safari.self.tab.dispatchMessage('KeywordSearchSaveSearch', [oldKey, key, url]);
@@ -223,6 +239,7 @@
         document.getElementById('searches').innerHTML = '';
         var selected = false,
             key;
+        expansions = sortExpansions(expansions);
         if (expansions.hasOwnProperty('Default')) {
             addSearch('Default', expansions['Default'], true);
             selected = true;
