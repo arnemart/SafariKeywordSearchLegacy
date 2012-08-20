@@ -120,7 +120,7 @@
 
 <div id="sidebar">
     <ul id="searches">
-        
+
     </ul>
     <div class="controls">
         <button id="add">+</button> <button id="remove">-</button>
@@ -142,7 +142,7 @@
 
 <script type="text/javascript">
     var expansions;
-    
+
     var sortExpansions = function(expansions) {
         var result = {},
             keys = [],
@@ -158,12 +158,12 @@
         });
         return result;
     };
-    
+
     var saveSearch = function(oldKey, key, url) {
         expansions[key] = url;
         safari.self.tab.dispatchMessage('KeywordSearchSaveSearch', [oldKey, key, url]);
     };
-    
+
     var showEditor = function(key) {
         var details = document.getElementById('details'),
             url = expansions[key] || '';
@@ -174,7 +174,7 @@
         document.getElementById('oldKey').value = key;
         document.getElementById('url').value = url;
     };
-    
+
     var updateSelected = function(key, url) {
         var selected = document.querySelector('#searches li.selected'),
             keywordElement = selected.querySelector('.keyword'),
@@ -184,7 +184,7 @@
         keywordElement.innerText = key;
         urlElement.innerText = url;
     };
-    
+
     var setSelected = function(key) {
         var searchRows = document.querySelectorAll('#searches li'),
             i, j, row, selected;
@@ -201,7 +201,7 @@
             }
         }
     };
-    
+
     var addSearch = function(key, url, active) {
         var searches = document.getElementById('searches'),
             newSearch = document.createElement('li');
@@ -220,12 +220,12 @@
             setSelected(key);
         }
     };
-    
+
     var deleteSearch = function(key) {
         delete expansions[key];
         safari.self.tab.dispatchMessage('KeywordSearchDeleteSearch', [key]);
     };
-    
+
     var deleteSelected = function() {
         var searches = document.getElementById('searches'),
             selected = document.querySelector('#searches li.selected'),
@@ -234,7 +234,7 @@
         deleteSearch(key);
         document.getElementById('details').style.display = 'none';
     };
-    
+
     var loadExpansions = function(expansions) {
         document.getElementById('searches').innerHTML = '';
         var selected = false,
@@ -256,7 +256,7 @@
             }
         }
     };
-    
+
     var serializeExpansions = function() {
         var expansions = {};
         var searchRows = document.querySelectorAll('#searches li'),
@@ -266,11 +266,11 @@
         }
         return expansions;
     };
-    
+
     var exportSettings = function() {
         prompt('Copy the text below and store it in a text file on, like, yor dropbox or something.', JSON.stringify(serializeExpansions()));
     };
-    
+
     var importSettings = function() {
         var newSettings = prompt('Paste your settings here:', '');
         try {
@@ -281,7 +281,7 @@
             alert('Syntax error in settings. Try again.');
         }
     };
-    
+
     document.getElementById('save').addEventListener('click', function() {
         var key = document.getElementById('keyword').value,
             oldKey = document.getElementById('oldKey').value,
@@ -289,21 +289,21 @@
         saveSearch(oldKey, key, url);
         updateSelected(key, url);
     }, false);
-    
+
     document.getElementById('add').addEventListener('click', function() {
         addSearch('key', '', true);
     }, false);
-    
+
     document.getElementById('remove').addEventListener('click', function() {
         deleteSelected();
     }, false);
-    
+
     document.getElementById('export').addEventListener('click', exportSettings, false);
-    
+
     document.getElementById('import').addEventListener('click', importSettings, false);
-    
+
     safari.self.tab.dispatchMessage('KeywordSearchLoadSearches');
-    
+
     safari.self.addEventListener('message', function(evt) {
         if (evt.name == 'KeywordSearchHereAreTheSearches') {
             expansions = evt.message[0];
