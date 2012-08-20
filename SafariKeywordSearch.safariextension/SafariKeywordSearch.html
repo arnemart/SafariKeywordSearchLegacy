@@ -66,13 +66,13 @@
                     break;
             }
         }, false);
-        
+
         safari.application.addEventListener('validate', function(evt) {
             if (!safari.extension.settings.enableMenuItem) {
                 evt.target.disabled = true;
             }
         }, false);
-        
+
         safari.application.addEventListener('command', function(evt) {
             if (evt.command == 'KeywordSearchSettings') {
                 var manageURL = safari.extension.baseURI + 'settings.html',
@@ -105,6 +105,8 @@
                 }
 
                 evt.preventDefault();
+
+                search = search.replace('&', '%26').replace('?', '%3F');
 
                 url = keywordExpansions[key].replace('%%%', search.replace(/ /g, '%20')).replace('@@@', search.replace(/ /g, '+'));
 
@@ -176,7 +178,7 @@
                 }
             }, false);
         }
-        
+
     </script>
 </head>
 <body>
