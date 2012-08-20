@@ -10,6 +10,7 @@ The following searches are included in the default set:
 - **down**: downforeveryoneorjustme.com
 - **e**: ebay.com
 - **g**: google.com
+- **gl**: google.com (“I’m feeling lucky”)
 - **gm**: maps.google.com
 - **imdb**: imdb.com
 - **so**: stackoverflow.com
@@ -17,7 +18,7 @@ The following searches are included in the default set:
 - **wa**: wolframalpha.com
 - **y**: youtube.com
 
-In addition to these, there is a **Default**-keyword that will trigger when no other keyword is provided, and what is entered into the address bar doesn't look like a URL. This is set to Googles “I am feeling lucky” search by default.
+In addition to these, there is a **Default**-keyword that will trigger when no other keyword is provided, and what is entered into the address bar doesn't look like a URL. This is set to Google by default, but can be changed to anything (try setting it to Googles “I’m feeling lucky search”).
 
 To edit or delete the search engines, or add your own, right-click any web page and select “Keyword Search Settings”. Here you can add keywords and search URLs, and delete or modify the existing ones. Put `@@@` in the search URL to insert the search string, or use `%%%` if you want spaces to be encoded as `%20` instead of `+`. It is also possible to have keyword expansions without search strings, if you just want quick bookmarks.
 
