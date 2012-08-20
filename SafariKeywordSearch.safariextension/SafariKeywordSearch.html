@@ -18,11 +18,29 @@
 
         var getExpansions = function() {
             var expansions = {},
+                foundDefault = false,
                 key;
             if (localStorage.getItem('___keywordExpansionsAreSaved')) {
                 for (key in localStorage) {
-                    if (key !== '___keywordExpansionsAreSaved' && localStorage.hasOwnProperty(key) && key.indexOf('com.apple.WebInspector') === -1) {
+                    if (key !== '___keywordExpansionsAreSaved' && key !== '___defaultUpgraded' && localStorage.hasOwnProperty(key) && key.indexOf('com.apple.WebInspector') === -1) {
                         expansions[key] = localStorage.getItem(key);
+                    }
+                }
+                if (expansions['Default'] && !localStorage.getItem('___defaultUpgraded')) {
+                    localStorage.setItem('___defaultUpgraded', '1');
+                    // Upgrade the "default"-keyword to take the URL from another keyword
+                    // Check if the default url exist in another keyword
+                    for (key in expansions) {
+                        if (key !== 'Default' && expansions.hasOwnProperty(key) && expansions[key] === expansions['Default']) {
+                            expansions['Default'] = key;
+                            foundDefault = true;
+                            break;
+                        }
+                    }
+                    // Otherwise, add it as a new keyword
+                    if (!foundDefault) {
+                        expansions['my_old_default'] = expansions['Default'];
+                        expansions['Default'] = 'my_old_default';
                     }
                 }
             } else {
@@ -32,7 +50,7 @@
                     down: 'http://downforeveryoneorjustme.com/@@@',
                     e: 'http://search.ebay.com/search/search.dll?satitle=@@@',
                     g: 'http://www.google.com/search?q=@@@',
-                    Default: "http://www.google.com/search?q=@@@",
+                    Default: 'g',
                     gl: "http://www.google.com/search?q=@@@&btnI=I'm+Feeling+Lucky",
                     gm: 'http://maps.google.com/maps?oi=map&q=@@@',
                     imdb: 'http://imdb.com/find?s=all&q=@@@',
@@ -98,7 +116,7 @@
                 if (keywordExpansions.hasOwnProperty(key)) {
                     search = parts.slice(1).join(' ');
                 } else if (keywordExpansions.hasOwnProperty('Default')) {
-                    key = 'Default';
+                    key = keywordExpansions['Default'];
                     search = query;
                 } else {
                     return;

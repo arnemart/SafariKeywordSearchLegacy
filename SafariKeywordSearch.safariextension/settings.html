@@ -62,6 +62,9 @@
         #sidebar li.selected .url {
             color: #ccc;
         }
+        #sidebar li.default .keyword::after {
+            content: ' - Default';
+        }
         #sidebar .keyword {
             font-weight: bold;
         }
@@ -107,7 +110,7 @@
             display: block;
             margin-bottom: 1em;
         }
-        #save {
+        #details button {
             font-size: 1.5em;
         }
     </style>
@@ -133,10 +136,12 @@
         <label>Keyword<br /><input type="text" id="keyword" /></label>
         <label>URL expansion<br /><textarea id="url"></textarea></label>
         <input type="hidden" id="oldKey" />
+        <button id="makeDefault">Set as default</button>
         <button id="save">Save</button>
         <p><strong>Keyword</strong> is the term you start your search query with.</p>
         <p><strong>URL expansion</strong> is the URL that should be used for searching. Put <strong>@@@</strong> in the URL where you want your search term to appear.</p>
         <p>If you want spaces encoded as <strong>%20</strong> instead of <strong>+</strong>, use <strong>%%%</strong> instead of <strong>@@@</strong>. This is useful e.g on Wikipedia.</p>
+        <p>The search engine that is marked as <strong>Default</strong> will be used when no keyword is provided.</p>
     </div>
 </div>
 
@@ -146,13 +151,18 @@
     var sortExpansions = function(expansions) {
         var result = {},
             keys = [],
+            defaultKey = expansions['Default'],
             key;
+
         for (key in expansions) {
-            if (expansions.hasOwnProperty(key)) {
+            if (expansions.hasOwnProperty(key) && key !== defaultKey) {
                 keys.push(key);
             }
         }
         keys = keys.sort();
+        if (defaultKey) {
+            keys.unshift(defaultKey);
+        }
         keys.forEach(function(key) {
             result[key] = expansions[key];
         });
@@ -191,13 +201,13 @@
         for (i = 0, j = searchRows.length; i < j; i++) {
             row = searchRows[i];
             rowKey = row.getAttribute('data-key');
-            selected = row.className === 'selected';
+            selected = row.className.match(/selected/);
             if (rowKey === key && !selected) {
-                row.className = 'selected';
+                row.className = row.className + ' selected';
                 row.scrollIntoViewIfNeeded();
                 showEditor(key);
             } else if (rowKey !== key) {
-                row.className = '';
+                row.className = row.className.replace(/\s*selected\s*/, '');
             }
         }
     };
@@ -221,6 +231,21 @@
         }
     };
 
+    var setDefault = function(key) {
+        var searchRows = document.querySelectorAll('#searches li'),
+            i, j, row, isDefault;
+        for (i = 0, j = searchRows.length; i < j; i++) {
+            row = searchRows[i];
+            rowKey = row.getAttribute('data-key');
+            isDefault = row.className.match(/default/);
+            if (rowKey === key && !isDefault) {
+                row.className = row.className + ' default';
+            } else if (rowKey !== key) {
+                row.className = row.className.replace(/\s*default\s*/, '');
+            }
+        }
+    };
+
     var deleteSearch = function(key) {
         delete expansions[key];
         safari.self.tab.dispatchMessage('KeywordSearchDeleteSearch', [key]);
@@ -240,10 +265,6 @@
         var selected = false,
             key;
         expansions = sortExpansions(expansions);
-        if (expansions.hasOwnProperty('Default')) {
-            addSearch('Default', expansions['Default'], true);
-            selected = true;
-        }
 
         for (key in expansions) {
             if (key !== 'Default' && expansions.hasOwnProperty(key)) {
@@ -254,6 +275,10 @@
                     addSearch(key, expansions[key], false);
                 }
             }
+        }
+
+        if (expansions.hasOwnProperty('Default')) {
+            setDefault(expansions['Default']);
         }
     };
 
@@ -289,6 +314,12 @@
         saveSearch(oldKey, key, url);
         updateSelected(key, url);
     }, false);
+
+    document.getElementById('makeDefault').addEventListener('click', function() {
+        var key = document.getElementById('keyword').value;
+        saveSearch('Default', 'Default', key);
+        setDefault(key);
+    });
 
     document.getElementById('add').addEventListener('click', function() {
         addSearch('key', '', true);
