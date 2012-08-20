@@ -1,7 +1,7 @@
 Safari Keyword Search
 =====================
 
-Safari Keyword Search is a simple extension for Safari 5.1 and above that enables keyword searching from the address bar. This is a simple but powerful feature that gives you access to several search engines using simple keywords. For example, you can search Google for pages about monkeys by typing `g monkey` in the address bar.
+Safari Keyword Search is a simple extension for Safari 5.1 and above that can change the default Safari search engine and enables keyword searching from the address bar. This is a simple but powerful feature that gives you access to several search engines using simple keywords. For example, you can search Wikipedia for information on monkeys by typing `w monkeys` in the address bar.
 
 The following searches are included in the default set:
 
@@ -18,7 +18,7 @@ The following searches are included in the default set:
 - **wa**: wolframalpha.com
 - **y**: youtube.com
 
-In addition to these, there is a **Default**-keyword that will trigger when no other keyword is provided, and what is entered into the address bar doesn't look like a URL. This is set to Google by default, but can be changed to anything (try setting it to Googles “I’m feeling lucky search”).
+Any search engine can be set as the default. The default search engine will be used when no keyword is provided. The default, uhm, default is regular Google search.
 
 To edit or delete the search engines, or add your own, right-click any web page and select “Keyword Search Settings”. Here you can add keywords and search URLs, and delete or modify the existing ones. Put `@@@` in the search URL to insert the search string, or use `%%%` if you want spaces to be encoded as `%20` instead of `+`. It is also possible to have keyword expansions without search strings, if you just want quick bookmarks.
 
