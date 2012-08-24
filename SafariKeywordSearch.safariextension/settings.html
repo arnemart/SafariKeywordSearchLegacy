@@ -311,8 +311,12 @@
         var key = document.getElementById('keyword').value,
             oldKey = document.getElementById('oldKey').value,
             url = document.getElementById('url').value;
-        saveSearch(oldKey, key, url);
-        updateSelected(key, url);
+        if (key.match(/^\s*$/) || url.match(/^\s*$/)) {
+            alert('Please enter a keyword and a URL');
+        } else {
+            saveSearch(oldKey, key, url);
+            updateSelected(key, url);
+        }
     }, false);
 
     document.getElementById('makeDefault').addEventListener('click', function() {
