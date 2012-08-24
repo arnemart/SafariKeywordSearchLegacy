@@ -123,6 +123,9 @@
                     search = parts.slice(1).join(' ');
                 } else if (keywordExpansions.hasOwnProperty('Default')) {
                     key = keywordExpansions['Default'];
+                    if (key === '') {
+                        return;
+                    }
                     search = query;
                 } else {
                     return;
