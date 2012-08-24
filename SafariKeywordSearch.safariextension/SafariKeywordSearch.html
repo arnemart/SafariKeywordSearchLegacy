@@ -9,6 +9,7 @@
         var saveExpansions = function(keywordExpansions) {
             localStorage.clear();
             localStorage.setItem('___keywordExpansionsAreSaved', '1');
+            localStorage.setItem('___defaultUpgraded', '1');
             for (var key in keywordExpansions) {
                 if (keywordExpansions.hasOwnProperty(key) && key.indexOf('com.apple.WebInspector') === -1) {
                     localStorage.setItem(key, keywordExpansions[key]);
@@ -24,23 +25,6 @@
                 for (key in localStorage) {
                     if (key !== '___keywordExpansionsAreSaved' && key !== '___defaultUpgraded' && localStorage.hasOwnProperty(key) && key.indexOf('com.apple.WebInspector') === -1) {
                         expansions[key] = localStorage.getItem(key);
-                    }
-                }
-                if (expansions['Default'] && !localStorage.getItem('___defaultUpgraded')) {
-                    localStorage.setItem('___defaultUpgraded', '1');
-                    // Upgrade the "default"-keyword to take the URL from another keyword
-                    // Check if the default url exist in another keyword
-                    for (key in expansions) {
-                        if (key !== 'Default' && expansions.hasOwnProperty(key) && expansions[key] === expansions['Default']) {
-                            expansions['Default'] = key;
-                            foundDefault = true;
-                            break;
-                        }
-                    }
-                    // Otherwise, add it as a new keyword
-                    if (!foundDefault) {
-                        expansions['my_old_default'] = expansions['Default'];
-                        expansions['Default'] = 'my_old_default';
                     }
                 }
             } else {
@@ -59,7 +43,29 @@
                     wa: 'http://www.wolframalpha.com/input/?i=@@@',
                     y: 'http://youtube.com/results?search_query=@@@'
                 };
-
+                saveExpansions(expansions);
+            }
+            if (expansions['Default'] && !localStorage.getItem('___defaultUpgraded')) {
+                localStorage.setItem('___defaultUpgraded', '1');
+                // Upgrade the "default"-keyword to take the URL from another keyword
+                // Check if the default url exist in another keyword
+                for (key in expansions) {
+                    if (key !== 'Default' && expansions.hasOwnProperty(key) && expansions[key] === expansions['Default']) {
+                        expansions['Default'] = key;
+                        foundDefault = true;
+                        break;
+                    }
+                }
+                // Otherwise, add it as a new keyword
+                if (!foundDefault) {
+                    expansions['my_old_default'] = expansions['Default'];
+                    expansions['Default'] = 'my_old_default';
+                }
+                saveExpansions(expansions);
+            }
+            // Reset default search to google if it does not match another keyword
+            if (expansions['Default'] && !expansions[expansions['Default']]) {
+                expansions['Default'] = 'g';
                 saveExpansions(expansions);
             }
             return expansions;
