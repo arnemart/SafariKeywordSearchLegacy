@@ -285,9 +285,13 @@
     var serializeExpansions = function() {
         var expansions = {};
         var searchRows = document.querySelectorAll('#searches li'),
-            i, j;
+            i, j, row;
         for (i = 0, j = searchRows.length; i < j; i++) {
-            expansions[searchRows[i].getAttribute('data-key')] = searchRows[i].getAttribute('data-url');
+            row = searchRows[i];
+            expansions[row.getAttribute('data-key')] = row.getAttribute('data-url');
+            if (row.className.match(/default/)) {
+                expansions['Default'] = row.getAttribute('data-key');
+            }
         }
         return expansions;
     };
