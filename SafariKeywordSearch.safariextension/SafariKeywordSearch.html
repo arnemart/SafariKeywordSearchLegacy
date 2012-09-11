@@ -187,8 +187,8 @@
                 }
 
                 // default query
-                if (!expandedUrl && keywordExpansions.hasOwnProperty('Default') && !url.match(/(^localhost|\/|\.|:)/)) {
-                    exp = keywordExpansions['Default'];
+                if (!expandedUrl && keywordExpansions[keywordExpansions['Default']] && !url.match(/(^localhost|\/|\.|:)/)) {
+                    exp = keywordExpansions[keywordExpansions['Default']];
                     expandedUrl = exp.replace('%%%', url).replace('@@@', url.replace(/ /g, '+'));
                 }
 
