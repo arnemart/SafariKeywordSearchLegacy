@@ -135,7 +135,7 @@
 
                 search = encodeURIComponent(search)
 
-                url = keywordExpansions[key].replace('%%%', search.replace(/ /g, '%20')).replace('@@@', search.replace(/ /g, '+'));
+                url = keywordExpansions[key].replace('%%%', search).replace('@@@', search.replace(/%20/g, '+'));
 
                 // Handle javascript expansions
                 if (url.match(/^javascript:/)) {
