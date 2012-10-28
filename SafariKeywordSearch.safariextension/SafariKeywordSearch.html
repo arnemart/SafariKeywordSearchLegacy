@@ -133,7 +133,7 @@
 
                 evt.preventDefault();
 
-                search = search.replace('&', '%26').replace('?', '%3F');
+                search = encodeURIComponent(search)
 
                 url = keywordExpansions[key].replace('%%%', search.replace(/ /g, '%20')).replace('@@@', search.replace(/ /g, '+'));
 
