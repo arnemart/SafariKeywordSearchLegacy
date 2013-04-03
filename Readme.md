@@ -31,6 +31,6 @@ Limitations
 Installation
 ------------
 
-1. Click the “Download”-button and download the extension file
+1. [Download the extension file](http://safarikeywordsearch.aurlien.net/SafariKeywordSearch.safariextz)
 2. Double-click it to install
 3. There is no step 3 :-)
