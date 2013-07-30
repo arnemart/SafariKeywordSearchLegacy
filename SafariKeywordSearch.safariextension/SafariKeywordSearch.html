@@ -111,7 +111,7 @@
         }, false);
 
          // Use the new beforeSearch event on Safari >= 6
-        if (parseInt(navigator.appVersion.match(/Version\/(\d+)\.\d(?:\.\d)? Safari/)[1]) >= 6) {
+        if (window.SafariBeforeSearchEvent) {
             safari.application.addEventListener('beforeSearch', function(evt) {
                 var query = evt.query,
                     keywordExpansions = getExpansions(),
