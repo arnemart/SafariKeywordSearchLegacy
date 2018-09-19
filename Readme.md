@@ -3,10 +3,7 @@ Safari Keyword Search
 
 **Not supported in Safari 12/macOS 10.14 Mojave:** Safari Keyword Search is written using the now “legacy” Safari extension API. Starting with Safari 12 these extensions are deprecated, and all new Safari extensions must use the new Safari App Extensions API. This new API does not incude access to the address bar in the same way as the old API, which means that this extension cannot be ported and will be unsupported going forward. Sorry about that.
 
-Two workarounds:
-
-1. Use [Search Alias](https://safari-extensions.apple.com/details/?id=com.damiancarrillo.search-alias-RADJYLEN7P). Requires manually entering all the aliases.
-2. Git clone SafariKeywordSearch. Open Safari and from the Develop menu (enabled via Settings -> Advanced) choose Show Extension Builder. Click "+", then Add Extension. Select the SafariKeywordSearch.safariextension folder. Click run.
+As a workaround you can use [Search Alias](https://safari-extensions.apple.com/details/?id=com.damiancarrillo.search-alias-RADJYLEN7P). Requires manually entering all your aliases again.
 
 ----
 
