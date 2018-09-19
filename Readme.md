@@ -1,6 +1,8 @@
 Safari Keyword Search
 =====================
 
+**Not supported in Safari 12/macOS 10.14 Mojave:** Safari Keyword Search is written using the now “legacy” Safari extension API. Starting with Safari 12 these extensions are deprecated, and all new Safari extensions must use the new Safari App Extensions API. This new API does not incude access to the address bar in the same way as the old API, which means that this extension cannot be ported and will be unsupported going forward. Sorry about that.
+
 Safari Keyword Search is a simple extension for Safari 5.1 and above that can change the default Safari search engine and enables keyword searching from the address bar. This is a simple but powerful feature that gives you access to several search engines using simple keywords. For example, you can search Wikipedia for information on monkeys by typing `w monkeys` in the address bar.
 
 The following searches are included in the default set:
